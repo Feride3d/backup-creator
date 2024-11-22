@@ -19,6 +19,6 @@ func NewFetchService(Provider ContentProvider) *FetchService {
 	return &FetchService{Provider: Provider}
 }
 
-func (s *FetchService) FetchUpdatedContentBlocks(ctx context.Context, lastRun time.Time) ([]model.ContentBlock, error) {
+func (s *FetchService) GetUpdatedContentBlocks(ctx context.Context, lastRun time.Time) ([]model.ContentBlock, error) {
 	return s.Provider.GetUpdatedContentBlocks(ctx, lastRun)
 }

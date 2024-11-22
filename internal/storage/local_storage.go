@@ -30,10 +30,10 @@ func (s *LocalStorage) SaveContentBlocks(ctx context.Context, blocks []model.Con
 		filePath := filepath.Join(backupPath, fmt.Sprintf("%d.json", block.ID))
 		data, err := json.MarshalIndent(block, "", "  ")
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to marshal block %d: %v", block.ID, err)
 		}
 		if err := os.WriteFile(filePath, data, 0644); err != nil {
-			return err
+			return fmt.Errorf("failed to write block %d to file: %v", block.ID, err)
 		}
 	}
 	fmt.Printf("Saved content blocks to local directory: %s\n", backupPath)

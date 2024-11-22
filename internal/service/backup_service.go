@@ -23,7 +23,7 @@ func NewBackupService(storage Storage) *BackupService {
 }
 
 // Saving each block to storage is an independent operation using goroutines
-func (s *BackupService) SaveContentBlocks(ctx context.Context, blocks []model.ContentBlock, folder string) error {
+func (s *BackupService) SaveContent(ctx context.Context, blocks []model.ContentBlock, folder string) error {
 	var wg sync.WaitGroup
 	errCh := make(chan error, len(blocks))
 
@@ -52,6 +52,6 @@ func (s *BackupService) SaveContentBlocks(ctx context.Context, blocks []model.Co
 }
 
 /* // option without goroutines
-func (s *BackupService) SaveContentBlocks(ctx context.Context, blocks []model.ContentBlock, folder string) error {
+func (s *BackupService) SaveContent(ctx context.Context, blocks []model.ContentBlock, folder string) error {
 	return s.storage.SaveContentBlocks(ctx, blocks, folder)
 } */
