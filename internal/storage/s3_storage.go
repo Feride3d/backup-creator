@@ -13,21 +13,51 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-type S3Storage struct {
-	uploader *s3manager.Uploader
-	bucket   string
+type Uploader interface {
+	Upload(input *s3manager.UploadInput) (*s3manager.UploadOutput, error)
 }
 
-func NewS3Storage(region, bucket, accessKey, secretKey string) *S3Storage {
-	sess := session.Must(session.NewSession(&aws.Config{
+type S3Storage struct {
+	Uploader Uploader
+	Bucket   string
+}
+
+type S3Uploader struct {
+	uploader *s3manager.Uploader
+}
+
+func NewS3Uploader(uploader *s3manager.Uploader) *S3Uploader {
+	return &S3Uploader{uploader: uploader}
+}
+
+func (a *S3Uploader) Upload(input *s3manager.UploadInput) (*s3manager.UploadOutput, error) {
+	return a.uploader.Upload(input)
+}
+
+func NewS3Storage(region, bucket, accessKey, secretKey string) (*S3Storage, error) {
+	if region == "" {
+		return nil, fmt.Errorf("region cannot be empty")
+	}
+	if accessKey == "" {
+		return nil, fmt.Errorf("accessKey cannot be empty")
+	}
+	if secretKey == "" {
+		return nil, fmt.Errorf("secretKey cannot be empty")
+	}
+
+	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String(region),
 		Credentials: credentials.NewStaticCredentials(accessKey, secretKey, ""),
-	}))
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create AWS session: %w", err)
+	}
+	realUploader := s3manager.NewUploader(sess)
 
 	return &S3Storage{
-		uploader: s3manager.NewUploader(sess),
-		bucket:   bucket,
-	}
+		Uploader: NewS3Uploader(realUploader),
+		Bucket:   bucket,
+	}, nil
 }
 
 // SaveContentBlocks uploads content blocks to S3
@@ -39,8 +69,8 @@ func (s *S3Storage) SaveContentBlocks(ctx context.Context, blocks []model.Conten
 		}
 
 		key := fmt.Sprintf("%s/%d.json", folder, block.ID)
-		_, err = s.uploader.Upload(&s3manager.UploadInput{
-			Bucket: aws.String(s.bucket),
+		_, err = s.Uploader.Upload(&s3manager.UploadInput{
+			Bucket: aws.String(s.Bucket),
 			Key:    aws.String(key),
 			Body:   bytes.NewReader(data),
 		})

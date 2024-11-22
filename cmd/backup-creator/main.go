@@ -35,7 +35,10 @@ func main() {
 
 	var selectedStorage service.Storage
 	if cfg.S3Bucket != "" {
-		selectedStorage = storage.NewS3Storage(cfg.S3Region, cfg.S3Bucket, cfg.S3AccessKey, cfg.S3SecretKey)
+		selectedStorage, err = storage.NewS3Storage(cfg.S3Region, cfg.S3Bucket, cfg.S3AccessKey, cfg.S3SecretKey)
+		if err != nil {
+			log.Fatalf("Failed to create S3 storage: %v", err)
+		}
 	} else {
 		selectedStorage = storage.NewLocalStorage(cfg.StoragePath)
 	}

@@ -1,4 +1,4 @@
-package service_test
+package service
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/Feride3d/backup-creator/internal/model"
-	"github.com/Feride3d/backup-creator/internal/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -25,7 +24,7 @@ func (m *MockStorage) SaveContentBlocks(ctx context.Context, blocks []model.Cont
 func TestBackupService_SaveContentBlocks_Success(t *testing.T) {
 
 	mockStorage := new(MockStorage)
-	backupService := service.NewBackupService(mockStorage)
+	backupService := NewBackupService(mockStorage)
 
 	ctx := context.Background()
 	blocks := []model.ContentBlock{
@@ -39,7 +38,7 @@ func TestBackupService_SaveContentBlocks_Success(t *testing.T) {
 		mockStorage.On("SaveContentBlocks", ctx, []model.ContentBlock{block}, folder).Return(nil).Once()
 	}
 
-	err := backupService.SaveContentBlocks(ctx, blocks, folder)
+	err := backupService.SaveContent(ctx, blocks, folder)
 
 	assert.NoError(t, err)
 	mockStorage.AssertExpectations(t)
@@ -48,7 +47,7 @@ func TestBackupService_SaveContentBlocks_Success(t *testing.T) {
 func TestBackupService_SaveContentBlocks_PartialFailure(t *testing.T) {
 
 	mockStorage := new(MockStorage)
-	backupService := service.NewBackupService(mockStorage)
+	backupService := NewBackupService(mockStorage)
 
 	ctx := context.Background()
 	blocks := []model.ContentBlock{
@@ -63,7 +62,7 @@ func TestBackupService_SaveContentBlocks_PartialFailure(t *testing.T) {
 	mockStorage.On("SaveContentBlocks", ctx, []model.ContentBlock{blocks[1]}, folder).Return(errors.New("disk full")).Once()
 	mockStorage.On("SaveContentBlocks", ctx, []model.ContentBlock{blocks[2]}, folder).Return(nil).Once()
 
-	err := backupService.SaveContentBlocks(ctx, blocks, folder)
+	err := backupService.SaveContent(ctx, blocks, folder)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "disk full")
@@ -73,7 +72,7 @@ func TestBackupService_SaveContentBlocks_PartialFailure(t *testing.T) {
 func TestBackupService_SaveContentBlocks_AllFailure(t *testing.T) {
 
 	mockStorage := new(MockStorage)
-	backupService := service.NewBackupService(mockStorage)
+	backupService := NewBackupService(mockStorage)
 
 	ctx := context.Background()
 	blocks := []model.ContentBlock{
@@ -87,7 +86,7 @@ func TestBackupService_SaveContentBlocks_AllFailure(t *testing.T) {
 		mockStorage.On("SaveContentBlocks", ctx, []model.ContentBlock{block}, folder).Return(errors.New("network error")).Once()
 	}
 
-	err := backupService.SaveContentBlocks(ctx, blocks, folder)
+	err := backupService.SaveContent(ctx, blocks, folder)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "network error")
@@ -97,7 +96,7 @@ func TestBackupService_SaveContentBlocks_AllFailure(t *testing.T) {
 func TestBackupService_SaveContentBlocks_Concurrency(t *testing.T) {
 
 	mockStorage := new(MockStorage)
-	backupService := service.NewBackupService(mockStorage)
+	backupService := NewBackupService(mockStorage)
 
 	ctx := context.Background()
 	blocks := []model.ContentBlock{
@@ -120,7 +119,7 @@ func TestBackupService_SaveContentBlocks_Concurrency(t *testing.T) {
 	}
 
 	go func() {
-		err := backupService.SaveContentBlocks(ctx, blocks, folder)
+		err := backupService.SaveContent(ctx, blocks, folder)
 		assert.NoError(t, err)
 	}()
 
