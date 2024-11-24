@@ -40,9 +40,7 @@ func (c *ContentClient) GetUpdatedContentBlocks(ctx context.Context, lastRun tim
 				"page":     page,
 				"pageSize": pageSize,
 			},
-			"fields": []string{
-				"id", "name", "modifiedDate", "content",
-			},
+			"fields": []string{"id", "name", "modifiedDate", "content"},
 		}
 
 		queryJSON, err := json.Marshal(query)
@@ -87,6 +85,10 @@ func (c *ContentClient) GetUpdatedContentBlocks(ctx context.Context, lastRun tim
 		}
 
 		page++
+	}
+
+	if len(allItems) == 0 {
+		return []model.ContentBlock{}, nil
 	}
 
 	return allItems, nil
