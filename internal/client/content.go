@@ -64,7 +64,7 @@ func (c *ContentClient) GetUpdatedContentBlocks(ctx context.Context, lastRun tim
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
-			return nil, fmt.Errorf("API responded with status: %s, body: %s", resp.Status, string(body))
+			return nil, fmt.Errorf("API error: %s (status: %d, response: %s)", url, resp.StatusCode, string(body))
 		}
 
 		var result struct {
