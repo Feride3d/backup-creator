@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/Feride3d/backup-creator/internal/model"
@@ -21,6 +22,9 @@ func NewAuthClient(authURL, clientID, clientSecret string) *AuthClient {
 }
 
 func (a *AuthClient) GetAccessToken() (model.Token, error) {
+	if _, err := url.ParseRequestURI(a.authURL); err != nil {
+		return model.Token{}, fmt.Errorf("invalid auth URL: %v", err)
+	}
 	payload := map[string]string{
 		"grant_type":    "client_credentials",
 		"client_id":     a.clientID,
