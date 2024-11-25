@@ -40,7 +40,7 @@ func TestContentClient_GetUpdatedContentBlocks_EdgeCases(t *testing.T) {
 			serverResponse: nil,
 			serverStatus:   http.StatusInternalServerError,
 			expectError:    true,
-			errorMessage:   "API responded with status",
+			errorMessage:   "API error",
 		},
 		{
 			name: "Malformed JSON response",

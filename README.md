@@ -76,3 +76,9 @@ Backup Creator is a tool designed to back up updated or new content blocks from 
 ### **Monitoring and Alerts**
 - Add notifications (e.g., Slack or Email) on task success or failure.
 
+ ## RUN
+  `docker run -p 8080:8080 --env-file .env backup-creator`
+
+  ## Tests
+  `go test -cover -count=1 ./...`
+  
