@@ -33,6 +33,38 @@ Backup Creator is a tool designed to back up updated or new content blocks from 
 5. **Parallel Processing:**
    - Saves content blocks concurrently to improve performance.
 
+```mermaid
+graph TD
+    %% Main application components
+    A[main.go] -->|Initializes| B[Scheduler]
+    A -->|Initializes| C[FetchService]
+    A -->|Initializes| D[BackupService]
+
+    %% Scheduler logic
+    B -->|Schedules tasks with cron| E[cron.Cron]
+    B -->|Reads last run time| F[LastRunFile]
+    B -->|Fetches data| C[FetchService]
+    B -->|Executes backup tasks| D[BackupService]
+
+    %% FetchService logic
+    C -->|Uses| G[ContentClient]
+    G -->|Interacts with| H[Salesforce API]
+    C -->|Implements| I[ContentProvider Interface]
+
+    %% BackupService logic
+    D -->|Saves content blocks| J[StorageProvider Interface]
+    J -->|Supports| K[LocalStorage]
+    J -->|Supports| L[S3Storage]
+
+    %% Content and Auth Management
+    H -->|Fetches data via token| M[Auth Service]
+    M -->|Handles| N[Token Management]
+
+    %% Supporting layers
+    F -->|Stores last execution time| O[File System]
+    J -->|Saves backups| O
+    J -->|Saves backups| P[S3 Bucket]
+```
 ---
 ## How It Works
 
@@ -76,9 +108,13 @@ Backup Creator is a tool designed to back up updated or new content blocks from 
 ### **Monitoring and Alerts**
 - Add notifications (e.g., Slack or Email) on task success or failure.
 
- ## RUN
+ ## Running the Program
   `docker run -p 8080:8080 --env-file .env backup-creator`
 
   ## Tests
   `go test -cover -count=1 ./...`
-  
+
+## Diagrams 
+
+Diagrams in this directory are maid with mermaidJS (https://mermaid.js.org/)
+The quickest option is to copy and paste the code in the live editor (https://mermaid.live)
