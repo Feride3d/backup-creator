@@ -8,7 +8,8 @@ import (
 )
 
 type ContentProvider interface {
-	GetUpdatedContentBlocks(ctx context.Context, lastRun time.Time) ([]model.ContentBlock, error)
+	GetUpdatedContentBlocksConcurrent(ctx context.Context, lastRun time.Time, workerCount int, query map[string]interface{}) ([]model.ContentBlock, error)
+	FetchPage(ctx context.Context, query map[string]interface{}, page, pageSize int) ([]model.ContentBlock, error)
 }
 
 type FetchService struct {
@@ -20,5 +21,7 @@ func NewFetchService(Provider ContentProvider) *FetchService {
 }
 
 func (s *FetchService) GetUpdatedContentBlocks(ctx context.Context, lastRun time.Time) ([]model.ContentBlock, error) {
-	return s.Provider.GetUpdatedContentBlocks(ctx, lastRun)
+	query := make(map[string]interface{})
+	workerCount := 5
+	return s.Provider.GetUpdatedContentBlocksConcurrent(ctx, lastRun, workerCount, query)
 }
