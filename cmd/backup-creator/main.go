@@ -23,15 +23,7 @@ func main() {
 		log.Fatalf("Failed to get access token: %v", err)
 	}
 
-	if token.IsExpired() {
-		log.Println("Token expired, requesting a new one")
-		token, err = authClient.GetAccessToken()
-		if err != nil {
-			log.Fatalf("Failed to refresh token: %v", err)
-		}
-	}
-
-	contentClient := client.NewContentClient(cfg.APIURL, token.AccessToken)
+	contentClient := client.NewContentClient(cfg.APIURL, &token, authClient)
 
 	var selectedStorage service.Storage
 	if cfg.S3Bucket != "" {
