@@ -50,8 +50,3 @@ func (s *BackupService) SaveContent(ctx context.Context, blocks []model.ContentB
 
 	return finalErr
 }
-
-/* // option without goroutines
-func (s *BackupService) SaveContent(ctx context.Context, blocks []model.ContentBlock, folder string) error {
-	return s.storage.SaveContentBlocks(ctx, blocks, folder)
-} */
